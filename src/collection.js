@@ -3,12 +3,12 @@ import BPromise from "bluebird";
 import jsonpatch from "fast-json-patch";
 
 var kinesis = BPromise.promisifyAll(new Kinesis({apiVersion: "2013-12-02"}));
-var STREAM_NAME = process.env.KINESIS_STREAM_NAME;
 
 export default class Collection {
 
-    constructor (name) {
+    constructor (name, kinesisStreamName) {
         this.name = name;
+        this.kinesisStreamName = kinesisStreamName;
     }
 
     processEvent ({method, params}) {
@@ -32,7 +32,7 @@ export default class Collection {
                 type: `/${this.name}/insert`
             }),
             PartitionKey: this.name,
-            StreamName: STREAM_NAME
+            StreamName: this.kinesisStreamName
         });
     }
 
@@ -45,7 +45,7 @@ export default class Collection {
                 type: `/${this.name}/remove`
             }),
             PartitionKey: this.name,
-            StreamName: STREAM_NAME
+            StreamName: this.kinesisStreamName
         });
     }
 
@@ -63,7 +63,7 @@ export default class Collection {
                 type: `/${this.name}/update`
             }),
             PartitionKey: this.name,
-            StreamName: STREAM_NAME
+            StreamName: this.kinesisStreamName
         });
     }
 
