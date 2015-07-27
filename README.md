@@ -73,18 +73,16 @@ The `data` property can be any JSON document.
     }
 ```
 
-### Update
+### Replace
 
 **API Gateway request body**:
 
 ```json
     {
-        "method": "/collection-name/update",
-        "params": ["elementId", [{
-            "op": "add",
-            "path": "/elementKey",
-            "value": "elementValue"
-        }]]
+        "method": "/collection-name/replace",
+        "params": ["elementId", "elementVersion", {
+            "replacedKey": "replacedValue"
+        }]
     }
 ```
 
@@ -94,27 +92,20 @@ The `data` property can be any JSON document.
     {
         "data": {
             "id": "elementId",
-            "patches": [{
-                "op": "add",
-                "path": "/elementKey",
-                "value": "elementValue"
-            }]
+            "version": "elementVersion",
+            "element": {
+                "replacedKey": "replacedValue"
+            }
         },
         "timestamp": 1437918813731,
-        "type": "/collection-name/update"
+        "type": "/collection-name/replace"
     }
 ```
-
-Patches is a list of [JSON patches](http://tools.ietf.org/html/rfc6902).
-A useful library to deal with JSON patches is
-[Starcounter-Jack/JSON-Patch](https://github.com/Starcounter-Jack/JSON-Patch)
-(also used by this library).
 
 ## Example usage
 
 ```js
-// Labmda function
-
+/* Labmda function */
 import Collection from "iwwa-kinesis-collection";
 
 var myCollection = new Collection("myCollectionName");
@@ -124,5 +115,4 @@ export function handler (event, context) {
         .then(contect.succeed)
         .catch(context.fail);
 }
-
 ```

@@ -1,6 +1,5 @@
 import {Kinesis} from "aws-sdk";
 import BPromise from "bluebird";
-import jsonpatch from "fast-json-patch";
 
 var kinesis = BPromise.promisifyAll(new Kinesis({apiVersion: "2013-12-02"}));
 
@@ -15,8 +14,8 @@ export default class Collection {
         if (method === `/${this.name}/insert`) {
             return this.insert(...params);
         }
-        if (method === `/${this.name}/update`) {
-            return this.update(...params);
+        if (method === `/${this.name}/replace`) {
+            return this.replace(...params);
         }
         if (method === `/${this.name}/remove`) {
             return this.remove(...params);
@@ -49,18 +48,13 @@ export default class Collection {
         });
     }
 
-    update (id, patches) {
-        // Ensure `patches` are valid JSON patches
-        var error = jsonpatch.validate(patches);
-        if (error) {
-            throw error;
-        }
+    replace (id, version, element) {
         // TODO: auth and validation
         return kinesis.putRecordAsync({
             Data: JSON.stringify({
-                data: {id, patches},
+                data: {id, version, element},
                 timestamp: Date.now(),
-                type: `/${this.name}/update`
+                type: `/${this.name}/replace`
             }),
             PartitionKey: this.name,
             StreamName: this.kinesisStreamName

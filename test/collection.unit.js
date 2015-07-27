@@ -24,18 +24,18 @@ describe("`processEvent` method", function () {
             params: ["remove", "name"]
         });
         expect(c.remove).to.have.been.calledWith("remove", "name");
-        // Update
-        c.update = sinon.spy();
+        // Replace
+        c.replace = sinon.spy();
         c.processEvent({
-            method: "/name/update",
-            params: ["update", "name"]
+            method: "/name/replace",
+            params: ["replace", "name"]
         });
-        expect(c.update).to.have.been.calledWith("update", "name");
+        expect(c.replace).to.have.been.calledWith("replace", "name");
     });
 
 });
 
-describe("`insert`, `remove` and `update` methods", function () {
+describe("`insert`, `remove` and `replace` methods", function () {
 
     var kinesis = {
         putRecordAsync: sinon.spy()
@@ -95,27 +95,24 @@ describe("`insert`, `remove` and `update` methods", function () {
 
     });
 
-    describe("`update`", function () {
+    describe("`replace`", function () {
 
-        it("adds update record to kinesis stream", function () {
+        it("adds replace record to kinesis stream", function () {
             var c = new Collection("name", "STREAM_NAME");
-            c.update("id", [{
-                op: "add",
-                path: "/key",
-                value: "value"
-            }]);
+            c.replace("id", "version", {
+                replacedKey: "replacedValue"
+            });
             expect(kinesis.putRecordAsync).to.have.been.calledWith({
                 Data: JSON.stringify({
                     data: {
                         id: "id",
-                        patches: [{
-                            op: "add",
-                            path: "/key",
-                            value: "value"
-                        }]
+                        version: "version",
+                        element: {
+                            replacedKey: "replacedValue"
+                        }
                     },
                     timestamp: 0,
-                    type: "/name/update"
+                    type: "/name/replace"
                 }),
                 PartitionKey: "name",
                 StreamName: "STREAM_NAME"
