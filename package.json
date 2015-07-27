@@ -2,7 +2,7 @@
   "name": "iwwa-kinesis-collection",
   "version": "2.0.0",
   "description": "Library to publish collection-related events to Amazon Kinesis",
-  "main": "src/collection.js",
+  "main": "dist/collection.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/innowation/iwwa-kinesis-collection.git"
@@ -28,10 +28,11 @@
     "sinon-chai": "^2.8.0"
   },
   "scripts": {
-    "compile": "gulp compile",
-    "test": "gulp test",
+    "build": "gulp build",
+    "dev": "gulp",
     "lint": "gulp lint",
-    "dev": "gulp"
+    "prepublish": "gulp build",
+    "test": "gulp test"
   },
   "author": "Team Wattellina <wattellina@mondora.com>",
   "license": "Apache-2.0"
