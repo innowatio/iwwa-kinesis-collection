@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/innowatio/iwwa-kinesis-collection.svg?branch=master)](https://travis-ci.org/innowatio/iwwa-kinesis-collection)
+[![Coverage Status](https://coveralls.io/repos/innowatio/iwwa-kinesis-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/innowatio/iwwa-kinesis-collection?branch=master)
 [![Dependency Status](https://david-dm.org/innowatio/iwwa-kinesis-collection.svg)](https://david-dm.org/innowatio/iwwa-kinesis-collection)
 [![devDependency Status](https://david-dm.org/innowatio/iwwa-kinesis-collection/dev-status.svg)](https://david-dm.org/innowatio/iwwa-kinesis-collection#info=devDependencies)
 
@@ -16,6 +17,8 @@ collection-related events into a Kinesis Stream. The consumer is invoked by
 Kinesis, and its job is to build a materialized view of the collection into
 DynamoDB, taking as source the collection-related events created by the
 producer.
+
+![Flow](./docs/flow.svg)
 
 ## Application event format
 
