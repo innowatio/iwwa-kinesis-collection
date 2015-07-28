@@ -18,7 +18,7 @@ Kinesis, and its job is to build a materialized view of the collection into
 DynamoDB, taking as source the collection-related events created by the
 producer.
 
-![Flow](./docs/flow.svg)
+![Flow](./docs/flow.png)
 
 ## Application event format
 
