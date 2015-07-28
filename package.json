@@ -2,7 +2,7 @@
   "name": "lkd-collection",
   "version": "1.0.0",
   "description": "Implement collections in a lkd stack (Lambda, Kinesis, DynamoDB)",
-  "main": "dist/collection.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/innowation/lkd-collection.git"
