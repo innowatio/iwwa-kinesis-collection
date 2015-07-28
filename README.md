@@ -5,8 +5,7 @@
 
 #lkd-collection
 
-This library is used to implement collections in a lkd stack (Lambda, Kinesis,
-DynamoDB).
+Implement collections in a lkd stack (Lambda, Kinesis, DynamoDB).
 
 ## How it works
 

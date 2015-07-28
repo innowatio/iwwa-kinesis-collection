@@ -1,11 +1,11 @@
 {
-  "name": "iwwa-kinesis-collection",
-  "version": "2.1.0",
-  "description": "Library to publish collection-related events to Amazon Kinesis",
+  "name": "lkd-collection",
+  "version": "1.0.0",
+  "description": "Implement collections in a lkd stack (Lambda, Kinesis, DynamoDB)",
   "main": "dist/collection.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/innowation/iwwa-kinesis-collection.git"
+    "url": "https://github.com/innowation/lkd-collection.git"
   },
   "dependencies": {
     "aws-sdk": "^2.1.39",
