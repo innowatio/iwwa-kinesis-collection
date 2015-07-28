@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/innowatio/iwwa-kinesis-collection.svg?branch=master)](https://travis-ci.org/innowatio/iwwa-kinesis-collection)
-[![Coverage Status](https://coveralls.io/repos/innowatio/iwwa-kinesis-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/innowatio/iwwa-kinesis-collection?branch=master)
-[![Dependency Status](https://david-dm.org/innowatio/iwwa-kinesis-collection.svg)](https://david-dm.org/innowatio/iwwa-kinesis-collection)
-[![devDependency Status](https://david-dm.org/innowatio/iwwa-kinesis-collection/dev-status.svg)](https://david-dm.org/innowatio/iwwa-kinesis-collection#info=devDependencies)
+[![Build Status](https://travis-ci.org/innowatio/lkd-collection.svg?branch=master)](https://travis-ci.org/innowatio/lkd-collection)
+[![Coverage Status](https://coveralls.io/repos/innowatio/lkd-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/innowatio/lkd-collection?branch=master)
+[![Dependency Status](https://david-dm.org/innowatio/lkd-collection.svg)](https://david-dm.org/innowatio/lkd-collection)
+[![devDependency Status](https://david-dm.org/innowatio/lkd-collection/dev-status.svg)](https://david-dm.org/innowatio/lkd-collection#info=devDependencies)
 
 #lkd-collection
 
