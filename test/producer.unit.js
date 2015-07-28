@@ -103,12 +103,11 @@ describe("`insert`, `remove` and `replace` functions", function () {
                 kinesisStreamName: "STREAM_NAME"
             };
             var remove = producer.__get__("remove");
-            remove.call(instance, "id", "version");
+            remove.call(instance, "id");
             expect(kinesis.putRecord).to.have.been.calledWith({
                 Data: JSON.stringify({
                     data: {
-                        id: "id",
-                        version: "version"
+                        id: "id"
                     },
                     timestamp: 0,
                     type: "/name/remove"
@@ -128,14 +127,13 @@ describe("`insert`, `remove` and `replace` functions", function () {
                 kinesisStreamName: "STREAM_NAME"
             };
             var replace = producer.__get__("replace");
-            replace.call(instance, "id", "version", {
+            replace.call(instance, "id", {
                 replacedKey: "replacedValue"
             });
             expect(kinesis.putRecord).to.have.been.calledWith({
                 Data: JSON.stringify({
                     data: {
                         id: "id",
-                        version: "version",
                         element: {
                             replacedKey: "replacedValue"
                         }

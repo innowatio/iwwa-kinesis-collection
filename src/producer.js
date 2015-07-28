@@ -13,11 +13,11 @@ var insert = function insert (element) {
     });
 };
 
-var remove = function remove (id, version) {
+var remove = function remove (id) {
     // TODO: auth and validation
     return kinesis.putRecord({
         Data: JSON.stringify({
-            data: {id, version},
+            data: {id},
             timestamp: Date.now(),
             type: `/${this.name}/remove`
         }),
@@ -26,11 +26,11 @@ var remove = function remove (id, version) {
     });
 };
 
-var replace = function replace (id, version, element) {
+var replace = function replace (id, element) {
     // TODO: auth and validation
     return kinesis.putRecord({
         Data: JSON.stringify({
-            data: {id, version, element},
+            data: {id, element},
             timestamp: Date.now(),
             type: `/${this.name}/replace`
         }),

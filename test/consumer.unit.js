@@ -80,18 +80,14 @@ describe("`insert`, `remove` and `replace` functions", function () {
         v4: sinon.stub().returns("id")
     };
 
-    var hashObj = sinon.stub().returns("hash");
-
     before(function () {
         consumer.__Rewire__("dynamodb", dynamodb);
         consumer.__Rewire__("uuid", uuid);
-        consumer.__Rewire__("hashObj", hashObj);
     });
 
     after(function () {
         consumer.__ResetDependency__("dynamodb");
         consumer.__ResetDependency__("uuid");
-        consumer.__ResetDependency__("hashObj");
     });
 
     beforeEach(function () {
@@ -114,8 +110,7 @@ describe("`insert`, `remove` and `replace` functions", function () {
             expect(dynamodb.putItem).to.have.been.calledWith({
                 Item: {
                     key: "value",
-                    id: "id",
-                    version: "hash"
+                    id: "id"
                 },
                 TableName: "TABLE_NAME"
             });
@@ -131,8 +126,7 @@ describe("`insert`, `remove` and `replace` functions", function () {
             };
             var remove = consumer.__get__("remove");
             remove.call(instance, {
-                id: "id",
-                version: "version"
+                id: "id"
             });
             expect(dynamodb.deleteItem).to.have.been.calledWith({
                 Key: {
@@ -140,15 +134,6 @@ describe("`insert`, `remove` and `replace` functions", function () {
                         S: "id"
                     }
                 },
-                ExpressionAttributeNames: {
-                    "#oldVersion": "version"
-                },
-                ExpressionAttributeValues: {
-                    ":versionToUpdate": {
-                        S: "version"
-                    }
-                },
-                ConditionExpression: "#oldVersion = :versionToUpdate",
                 TableName: "TABLE_NAME"
             });
         });
@@ -164,7 +149,6 @@ describe("`insert`, `remove` and `replace` functions", function () {
             var replace = consumer.__get__("replace");
             replace.call(instance, {
                 id: "id",
-                version: "version",
                 element: {
                     key: "value"
                 }
@@ -172,18 +156,8 @@ describe("`insert`, `remove` and `replace` functions", function () {
             expect(dynamodb.putItem).to.have.been.calledWith({
                 Item: {
                     id: "id",
-                    version: "hash",
                     key: "value"
                 },
-                ExpressionAttributeNames: {
-                    "#oldVersion": "version"
-                },
-                ExpressionAttributeValues: {
-                    ":versionToUpdate": {
-                        S: "version"
-                    }
-                },
-                ConditionExpression: "#oldVersion = :versionToUpdate",
                 TableName: "TABLE_NAME"
             });
         });

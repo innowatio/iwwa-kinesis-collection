@@ -10,7 +10,6 @@
   "dependencies": {
     "aws-sdk": "^2.1.39",
     "bluebird": "^2.9.34",
-    "hash-obj": "^1.0.0",
     "node-uuid": "^1.4.3",
     "ramda": "^0.17.1"
   },

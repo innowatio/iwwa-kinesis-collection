@@ -2,12 +2,20 @@
 [![Dependency Status](https://david-dm.org/innowatio/iwwa-kinesis-collection.svg)](https://david-dm.org/innowatio/iwwa-kinesis-collection)
 [![devDependency Status](https://david-dm.org/innowatio/iwwa-kinesis-collection/dev-status.svg)](https://david-dm.org/innowatio/iwwa-kinesis-collection#info=devDependencies)
 
-# iwwa-kinesis-collection
+#lkd-collection
 
-This library is intended to be used within a AWS lambda function. Its purpose is
-to receive "collection events" from http requests routed through by AWS API
-Gateway, to convert those events into the application event format and pipe them
-to kinesis.
+This library is used to implement collections in a lkd stack (Lambda, Kinesis,
+DynamoDB).
+
+## How it works
+
+The library implements two lambda functions: a producer and a consumer.
+
+The producer is invoked by API Gateway, and its job is to publish
+collection-related events into a Kinesis Stream. The consumer is invoked by
+Kinesis, and its job is to build a materialized view of the collection into
+DynamoDB, taking as source the collection-related events created by the
+producer.
 
 ## Application event format
 
@@ -50,6 +58,15 @@ The `data` property can be any JSON document.
     }
 ```
 
+**Resulting document inserted into dynamodb**
+
+```json
+{
+    "id": "someId",
+    "elementKey": "elementValue"
+}
+```
+
 ### Remove
 
 **API Gateway request body**:
@@ -73,6 +90,10 @@ The `data` property can be any JSON document.
     }
 ```
 
+**Resuling operation on dynamodb**
+
+Removal of document with `document.id === elementId`.
+
 ### Replace
 
 **API Gateway request body**:
@@ -80,7 +101,7 @@ The `data` property can be any JSON document.
 ```json
     {
         "method": "/collection-name/replace",
-        "params": ["elementId", "elementVersion", {
+        "params": ["elementId", {
             "replacedKey": "replacedValue"
         }]
     }
@@ -92,7 +113,6 @@ The `data` property can be any JSON document.
     {
         "data": {
             "id": "elementId",
-            "version": "elementVersion",
             "element": {
                 "replacedKey": "replacedValue"
             }
@@ -102,17 +122,37 @@ The `data` property can be any JSON document.
     }
 ```
 
+**Resulting document inserted into dynamodb (replaces the existing one)**
+
+```json
+{
+    "id": "someId",
+    "replacedKey": "replacedValue"
+}
+```
+
 ## Example usage
 
 ```js
-/* Labmda function */
-import Collection from "iwwa-kinesis-collection";
+/* Lambda function invoked by API Gateway */
+import Collection from "lkd-collection";
 
-var myCollection = new Collection("myCollectionName");
+var myCollection = new Collection({
+    name: "myCollectionName"
+    kinesisStreamName: "myStream"
+});
 
-export function handler (event, context) {
-    myCollection.processEvent(event)
-        .then(contect.succeed)
-        .catch(context.fail);
-}
+export var handler = myCollection.producer;
+```
+
+```js
+/* Lambda function invoked by Kinesis */
+import Collection from "lkd-collection";
+
+var myCollection = new Collection({
+    name: "myCollectionName",
+    dynamodbTableName: "myTable"
+});
+
+export var handler = myCollection.consumer;
 ```

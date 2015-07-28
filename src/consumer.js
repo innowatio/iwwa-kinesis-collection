@@ -1,54 +1,30 @@
 import uuid from "node-uuid";
 import {merge} from "ramda";
-import hashObj from "hash-obj";
 
 import * as dynamodb from "./common/dynamodb";
 
 var insert = function insert ({element}) {
     var id = uuid.v4();
-    var version = hashObj(element);
     return dynamodb.putItem({
-        Item: merge(element, {id, version}),
+        Item: merge(element, {id}),
         TableName: this.dynamodbTableName
     });
 };
 
-var remove = function remove ({id, version}) {
+var remove = function remove ({id}) {
     return dynamodb.deleteItem({
         Key: {
             id: {
                 S: id
             }
         },
-        ExpressionAttributeNames: {
-            "#oldVersion": "version"
-        },
-        ExpressionAttributeValues: {
-            ":versionToUpdate": {
-                S: version
-            }
-        },
-        ConditionExpression: "#oldVersion = :versionToUpdate",
         TableName: this.dynamodbTableName
     });
 };
 
-var replace = function replace ({id, version, element}) {
-    var newVersion = hashObj(element);
+var replace = function replace ({id, element}) {
     return dynamodb.putItem({
-        Item: merge(element, {
-            id,
-            version: newVersion
-        }),
-        ExpressionAttributeNames: {
-            "#oldVersion": "version"
-        },
-        ExpressionAttributeValues: {
-            ":versionToUpdate": {
-                S: version
-            }
-        },
-        ConditionExpression: "#oldVersion = :versionToUpdate",
+        Item: merge(element, {id}),
         TableName: this.dynamodbTableName
     });
 };
