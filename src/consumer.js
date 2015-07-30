@@ -16,11 +16,7 @@ var insert = function insert (event) {
 var remove = function remove (event) {
     var {id} = event.data;
     return dynamodb.deleteItem({
-        Key: {
-            id: {
-                S: id
-            }
-        },
+        Key: {id},
         TableName: this.dynamodbTableName
     });
 };

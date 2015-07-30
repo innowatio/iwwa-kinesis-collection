@@ -71,9 +71,7 @@ describe("`insert`, `remove` and `replace` functions", function () {
             });
             expect(dynamodb.deleteItem).to.have.been.calledWith({
                 Key: {
-                    id: {
-                        S: "id"
-                    }
+                    id: "id"
                 },
                 TableName: "TABLE_NAME"
             });
