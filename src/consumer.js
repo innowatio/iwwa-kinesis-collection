@@ -1,9 +1,11 @@
+import router from "kinesis-router";
 import uuid from "node-uuid";
 import {merge} from "ramda";
 
 import * as dynamodb from "./common/dynamodb";
 
-var insert = function insert ({element}) {
+var insert = function insert (event) {
+    var {element} = event.data;
     var id = uuid.v4();
     return dynamodb.putItem({
         Item: merge(element, {id}),
@@ -11,7 +13,8 @@ var insert = function insert ({element}) {
     });
 };
 
-var remove = function remove ({id}) {
+var remove = function remove (event) {
+    var {id} = event.data;
     return dynamodb.deleteItem({
         Key: {
             id: {
@@ -22,34 +25,18 @@ var remove = function remove ({id}) {
     });
 };
 
-var replace = function replace ({id, element}) {
+var replace = function replace (event) {
+    var {id, element} = event.data;
     return dynamodb.putItem({
         Item: merge(element, {id}),
         TableName: this.dynamodbTableName
     });
 };
 
-var processKinesisEvent = function processKinesisEvent (event) {
-    // Only consider the first record
-    var data = new Buffer(
-        event.Records[0].kinesis.data,
-        "base64"
-    ).toString("ascii");
-    var applicationEvent = JSON.parse(data);
-    // Route based on the application event type
-    if (applicationEvent.type === `/${this.name}/insert`) {
-        insert.call(this, applicationEvent.data);
-    }
-    if (applicationEvent.type === `/${this.name}/remove`) {
-        remove.call(this, applicationEvent.data);
-    }
-    if (applicationEvent.type === `/${this.name}/replace`) {
-        replace.call(this, applicationEvent.data);
-    }
-};
-
-export default function consumer (event, context) {
-    return processKinesisEvent.call(this, event)
-        .then(() => context.succeed())
-        .catch(err => context.fail(err));
+export default function consumer (kinesisEvent, context) {
+    return router()
+        .on(`/${this.name}/insert`, insert.bind(this))
+        .on(`/${this.name}/remove`, remove.bind(this))
+        .on(`/${this.name}/replace`, replace.bind(this))
+        .call(null, kinesisEvent, context);
 }

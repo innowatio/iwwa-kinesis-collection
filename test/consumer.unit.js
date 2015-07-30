@@ -6,69 +6,6 @@ chai.use(sinonChai);
 
 import consumer from "consumer";
 
-describe("`processKinesisEvent`", function () {
-
-    var insert = sinon.spy();
-    var remove = sinon.spy();
-    var replace = sinon.spy();
-
-    before(function () {
-        consumer.__Rewire__("insert", insert);
-        consumer.__Rewire__("remove", remove);
-        consumer.__Rewire__("replace", replace);
-    });
-
-    after(function () {
-        consumer.__ResetDependency__("insert");
-        consumer.__ResetDependency__("remove");
-        consumer.__ResetDependency__("replace");
-    });
-
-    it("calls the correct function based on the `type` property of the application event", function () {
-        var instance = {
-            name: "name"
-        };
-        var processKinesisEvent = consumer.__get__("processKinesisEvent");
-        // Insert
-        processKinesisEvent.call(instance, {
-            Records: [{
-                kinesis: {
-                    data: new Buffer(JSON.stringify({
-                        type: "/name/insert",
-                        data: "insert"
-                    })).toString("base64")
-                }
-            }]
-        });
-        expect(insert).to.have.been.calledWith("insert");
-        // Remove
-        processKinesisEvent.call(instance, {
-            Records: [{
-                kinesis: {
-                    data: new Buffer(JSON.stringify({
-                        type: "/name/remove",
-                        data: "remove"
-                    })).toString("base64")
-                }
-            }]
-        });
-        expect(remove).to.have.been.calledWith("remove");
-        // Replace
-        processKinesisEvent.call(instance, {
-            Records: [{
-                kinesis: {
-                    data: new Buffer(JSON.stringify({
-                        type: "/name/replace",
-                        data: "replace"
-                    })).toString("base64")
-                }
-            }]
-        });
-        expect(replace).to.have.been.calledWith("replace");
-    });
-
-});
-
 describe("`insert`, `remove` and `replace` functions", function () {
 
     var dynamodb = {
@@ -103,8 +40,10 @@ describe("`insert`, `remove` and `replace` functions", function () {
             };
             var insert = consumer.__get__("insert");
             insert.call(instance, {
-                element: {
-                    key: "value"
+                data: {
+                    element: {
+                        key: "value"
+                    }
                 }
             });
             expect(dynamodb.putItem).to.have.been.calledWith({
@@ -126,7 +65,9 @@ describe("`insert`, `remove` and `replace` functions", function () {
             };
             var remove = consumer.__get__("remove");
             remove.call(instance, {
-                id: "id"
+                data: {
+                    id: "id"
+                }
             });
             expect(dynamodb.deleteItem).to.have.been.calledWith({
                 Key: {
@@ -148,9 +89,11 @@ describe("`insert`, `remove` and `replace` functions", function () {
             };
             var replace = consumer.__get__("replace");
             replace.call(instance, {
-                id: "id",
-                element: {
-                    key: "value"
+                data: {
+                    id: "id",
+                    element: {
+                        key: "value"
+                    }
                 }
             });
             expect(dynamodb.putItem).to.have.been.calledWith({
