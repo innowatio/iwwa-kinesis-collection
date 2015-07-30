@@ -1,6 +1,6 @@
 {
   "name": "lkd-collection",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Implement collections in a lkd stack (Lambda, Kinesis, DynamoDB)",
   "main": "dist/index.js",
   "repository": {
