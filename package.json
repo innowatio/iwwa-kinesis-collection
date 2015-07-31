@@ -1,11 +1,11 @@
 {
-  "name": "lkd-collection",
+  "name": "lk-collection",
   "version": "1.0.3",
   "description": "Implement collections in a lkd stack (Lambda, Kinesis, DynamoDB)",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/innowation/lkd-collection.git"
+    "url": "https://github.com/innowation/lk-collection.git"
   },
   "dependencies": {
     "aws-sdk": "^2.1.39",

@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/innowatio/lkd-collection.svg?branch=master)](https://travis-ci.org/innowatio/lkd-collection)
-[![Coverage Status](https://coveralls.io/repos/innowatio/lkd-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/innowatio/lkd-collection?branch=master)
-[![Dependency Status](https://david-dm.org/innowatio/lkd-collection.svg)](https://david-dm.org/innowatio/lkd-collection)
-[![devDependency Status](https://david-dm.org/innowatio/lkd-collection/dev-status.svg)](https://david-dm.org/innowatio/lkd-collection#info=devDependencies)
+[![Build Status](https://travis-ci.org/innowatio/lk-collection.svg?branch=master)](https://travis-ci.org/innowatio/lk-collection)
+[![Coverage Status](https://coveralls.io/repos/innowatio/lk-collection/badge.svg?branch=master&service=github)](https://coveralls.io/github/innowatio/lk-collection?branch=master)
+[![Dependency Status](https://david-dm.org/innowatio/lk-collection.svg)](https://david-dm.org/innowatio/lk-collection)
+[![devDependency Status](https://david-dm.org/innowatio/lk-collection/dev-status.svg)](https://david-dm.org/innowatio/lk-collection#info=devDependencies)
 
-#lkd-collection
+#lk-collection
 
 Implement collections in an lk stack (Lambda, Kinesis).
 
@@ -160,7 +160,7 @@ Mongodb:
 
 ```js
 /* Lambda function invoked by API Gateway */
-import Collection from "lkd-collection";
+import Collection from "lk-collection";
 
 var myCollection = new Collection({
     name: "myCollectionName"
@@ -172,7 +172,7 @@ export var handler = myCollection.jsonRpcToKinesis;
 
 ```js
 /* Lambda function invoked by Kinesis */
-import Collection from "lkd-collection";
+import Collection from "lk-collection";
 
 var myCollection = new Collection({
     name: "myCollectionName",
@@ -184,7 +184,7 @@ export var handler = myCollection.kinesisToDynamodb;
 
 ```js
 /* Lambda function invoked by Kinesis */
-import Collection from "lkd-collection";
+import Collection from "lk-collection";
 
 var myCollection = new Collection({
     name: "myCollectionName",
