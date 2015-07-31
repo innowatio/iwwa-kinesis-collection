@@ -12,6 +12,7 @@
     "bluebird": "^2.9.34",
     "dynamodb-doc": "^1.0.0",
     "kinesis-router": "^1.0.1",
+    "mongodb": "^2.0.39",
     "node-uuid": "^1.4.3",
     "ramda": "^0.17.1"
   },

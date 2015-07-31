@@ -1,45 +1,48 @@
+import uuid from "node-uuid";
+
 import * as kinesis from "./common/kinesis";
 
-var insert = function insert (element) {
+var insert = function (element) {
     // TODO: auth and validation
+    var id = uuid.v4();
     return kinesis.putRecord({
         Data: JSON.stringify({
-            data: {element},
+            data: {element, id},
             timestamp: Date.now(),
-            type: `/${this.name}/insert`
+            type: `element inserted in collection ${this.name}`
         }),
         PartitionKey: this.name,
         StreamName: this.kinesisStreamName
     });
 };
 
-var remove = function remove (id) {
+var remove = function (id) {
     // TODO: auth and validation
     return kinesis.putRecord({
         Data: JSON.stringify({
             data: {id},
             timestamp: Date.now(),
-            type: `/${this.name}/remove`
+            type: `element removed in collection ${this.name}`
         }),
         PartitionKey: this.name,
         StreamName: this.kinesisStreamName
     });
 };
 
-var replace = function replace (id, element) {
+var replace = function (id, element) {
     // TODO: auth and validation
     return kinesis.putRecord({
         Data: JSON.stringify({
             data: {id, element},
             timestamp: Date.now(),
-            type: `/${this.name}/replace`
+            type: `element replaced in collection ${this.name}`
         }),
         PartitionKey: this.name,
         StreamName: this.kinesisStreamName
     });
 };
 
-var processApiGatewayEvent = function processApiGatewayEvent (event) {
+var processRpc = function (event) {
     var {method, params} = event;
     if (method === `/${this.name}/insert`) {
         return insert.apply(this, params);
@@ -52,8 +55,14 @@ var processApiGatewayEvent = function processApiGatewayEvent (event) {
     }
 };
 
-export default function producer (event, context) {
-    return processApiGatewayEvent.call(this, event)
-        .then(() => context.succeed())
-        .catch(err => context.fail(err));
+export default function jsonRpcToKinesis (event, context) {
+    return processRpc.call(this, event)
+        .then(() => context.succeed({
+            id: event.id,
+            result: null
+        }))
+        .catch(err => context.fail({
+            id: event.id,
+            error: err
+        }));
 }

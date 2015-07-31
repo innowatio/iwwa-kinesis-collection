@@ -1,14 +1,26 @@
-import consumer from "./consumer";
-import producer from "./producer";
+import jsonRpcToKinesis from "./json-rpc-to-kinesis";
+import kinesisToDynamodb from "./kinesis-to-dynamodb";
+import kinesisToMongodb from "./kinesis-to-mongodb";
 
 export default class Collection {
 
-    constructor ({name, kinesisStreamName, dynamodbTableName}) {
-        this.name = name;
-        this.kinesisStreamName = kinesisStreamName;
-        this.dynamodbTableName = dynamodbTableName;
-        this.consumer = consumer.bind(this);
-        this.producer = producer.bind(this);
+    constructor (options) {
+
+        this.name = options.name;
+
+        // Configure jsonRpcToKinesis
+        this.kinesisStreamName = options.kinesisStreamName;
+        this.jsonRpcToKinesis = jsonRpcToKinesis.bind(this);
+
+        // Configure kinesisToDynamodb
+        this.dynamodbTableName = options.dynamodbTableName;
+        this.kinesisToDynamodb = kinesisToDynamodb.bind(this);
+
+        // Configure kinesisToMongodb
+        this.mongodbUrl = options.mongodbUrl;
+        this.mongodbCollectionName = options.mongodbCollectionName;
+        this.kinesisToMongodb = kinesisToMongodb.bind(this);
+
     }
 
 }
