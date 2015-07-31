@@ -5,17 +5,21 @@
 
 #lkd-collection
 
-Implement collections in a lkd stack (Lambda, Kinesis, DynamoDB).
+Implement collections in an lk stack (Lambda, Kinesis).
 
 ## How it works
 
-The library implements two lambda functions: a producer and a consumer.
+The library allows creating a collection object which has attached three (for
+now) lambda functions:
 
-The producer is invoked by API Gateway, and its job is to publish
-collection-related events into a Kinesis Stream. The consumer is invoked by
-Kinesis, and its job is to build a materialized view of the collection into
-DynamoDB, taking as source the collection-related events created by the
-producer.
+- `jsonRpcToKinesis`: takes events shaped like a JSON Rpc call and maps them to
+  kinesis events
+
+- `kinesisToDynamodb`: takes kinesis events and projects them into a dynamodb
+  table
+
+- `kinesisToMongodb`: takes kinesis events and projects them into a mongodb
+  collection
 
 ![Flow](./docs/flow.png)
 
@@ -35,7 +39,7 @@ The `data` property can be any JSON document.
 
 ### Insert
 
-**API Gateway request body**:
+**JSON Rpc (coming, for instance, from an API Gateway request)**:
 
 ```json
     {
@@ -56,12 +60,13 @@ The `data` property can be any JSON document.
             }
         },
         "timestamp": 1437918813731,
-        "type": "/collection-name/insert"
+        "type": "element inserted in collection collection-name"
     }
 ```
 
-**Resulting document inserted into dynamodb**
+**Resulting document inserted into dynamodb / mongodb**
 
+Dynamodb:
 ```json
 {
     "id": "someId",
@@ -69,9 +74,17 @@ The `data` property can be any JSON document.
 }
 ```
 
+Mongodb:
+```json
+{
+    "_id": "someId",
+    "elementKey": "elementValue"
+}
+```
+
 ### Remove
 
-**API Gateway request body**:
+**JSON Rpc (coming, for instance, from an API Gateway request)**:
 
 ```json
     {
@@ -88,17 +101,18 @@ The `data` property can be any JSON document.
             "id": "elementId"
         },
         "timestamp": 1437918813731,
-        "type": "/collection-name/remove"
+        "type": "element removed in collection collection-name"
     }
 ```
 
-**Resuling operation on dynamodb**
+**Resuling operation performed in dynamodb / mongodb**
 
-Removal of document with `document.id === elementId`.
+Dynamodb: removal of document with `document.id === elementId`.
+Mongodb: removal of document with `document._id === elementId`.
 
 ### Replace
 
-**API Gateway request body**:
+**JSON Rpc (coming, for instance, from an API Gateway request)**:
 
 ```json
     {
@@ -120,15 +134,24 @@ Removal of document with `document.id === elementId`.
             }
         },
         "timestamp": 1437918813731,
-        "type": "/collection-name/replace"
+        "type": "element replaced in collection collection-name"
     }
 ```
 
-**Resulting document inserted into dynamodb (replaces the existing one)**
+**Resulting document inserted into dynamodb / mongodb (replaces the existing one)**
 
+Dynamodb:
 ```json
 {
     "id": "someId",
+    "replacedKey": "replacedValue"
+}
+```
+
+Mongodb:
+```json
+{
+    "_id": "someId",
     "replacedKey": "replacedValue"
 }
 ```
@@ -144,7 +167,7 @@ var myCollection = new Collection({
     kinesisStreamName: "myStream"
 });
 
-export var handler = myCollection.producer;
+export var handler = myCollection.jsonRpcToKinesis;
 ```
 
 ```js
@@ -156,5 +179,18 @@ var myCollection = new Collection({
     dynamodbTableName: "myTable"
 });
 
-export var handler = myCollection.consumer;
+export var handler = myCollection.kinesisToDynamodb;
+```
+
+```js
+/* Lambda function invoked by Kinesis */
+import Collection from "lkd-collection";
+
+var myCollection = new Collection({
+    name: "myCollectionName",
+    mongodbUrl: "mongodb://mongo:27017/myDatabase",
+    mongodbCollectionName: "myCollection"
+});
+
+export var handler = myCollection.kinesisToMongodb;
 ```
