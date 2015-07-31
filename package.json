@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/innowation/lk-collection.git"
+    "url": "https://github.com/innowatio/lk-collection.git"
   },
   "dependencies": {
     "aws-sdk": "^2.1.39",
