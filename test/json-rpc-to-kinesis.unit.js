@@ -88,6 +88,7 @@ describe("`jsonRpcToKinesis`", function () {
             insert.call(instance, {key: "value"});
             expect(kinesis.putRecord).to.have.been.calledWith({
                 Data: JSON.stringify({
+                    id: "id",
                     data: {
                         element: {key: "value"},
                         id: "id"
@@ -108,13 +109,19 @@ describe("`jsonRpcToKinesis`", function () {
             putRecord: sinon.spy()
         };
 
+        var uuid = {
+            v4: sinon.stub().returns("id")
+        };
+
         before(function () {
             jsonRpcToKinesis.__Rewire__("kinesis", kinesis);
+            jsonRpcToKinesis.__Rewire__("uuid", uuid);
             sinon.stub(Date, "now").returns(0);
         });
 
         after(function () {
             jsonRpcToKinesis.__ResetDependency__("kinesis");
+            jsonRpcToKinesis.__ResetDependency__("uuid");
             Date.now.restore();
         });
 
@@ -131,6 +138,7 @@ describe("`jsonRpcToKinesis`", function () {
             remove.call(instance, "id");
             expect(kinesis.putRecord).to.have.been.calledWith({
                 Data: JSON.stringify({
+                    id: "id",
                     data: {
                         id: "id"
                     },
@@ -150,13 +158,19 @@ describe("`jsonRpcToKinesis`", function () {
             putRecord: sinon.spy()
         };
 
+        var uuid = {
+            v4: sinon.stub().returns("id")
+        };
+
         before(function () {
             jsonRpcToKinesis.__Rewire__("kinesis", kinesis);
+            jsonRpcToKinesis.__Rewire__("uuid", uuid);
             sinon.stub(Date, "now").returns(0);
         });
 
         after(function () {
             jsonRpcToKinesis.__ResetDependency__("kinesis");
+            jsonRpcToKinesis.__ResetDependency__("uuid");
             Date.now.restore();
         });
 
@@ -175,6 +189,7 @@ describe("`jsonRpcToKinesis`", function () {
             });
             expect(kinesis.putRecord).to.have.been.calledWith({
                 Data: JSON.stringify({
+                    id: "id",
                     data: {
                         id: "id",
                         element: {

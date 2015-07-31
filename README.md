@@ -27,6 +27,7 @@ now) lambda functions:
 
 ```json
     {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
         "data": {},
         "timestamp": 1437918813731,
         "type": "event-type"
