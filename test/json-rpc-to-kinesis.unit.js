@@ -1,12 +1,131 @@
+import BPromise from "bluebird";
 import chai, {expect} from "chai";
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
 
 chai.use(sinonChai);
 
+/*
+*   Very strange, if I swap the order of the following two imports,
+*   ValidationError inside the `json-rpc-to-kinesis` module is undefined.
+*   No time to figure it out now, so TODO.
+*/
 import jsonRpcToKinesis from "json-rpc-to-kinesis";
+import {ValidationError} from "index";
 
 describe("`jsonRpcToKinesis`", function () {
+
+    describe("`jsonRpcToKinesis`", function () {
+        var processRpc = sinon.spy();
+
+        before(function () {
+            jsonRpcToKinesis.__Rewire__("processRpc", processRpc);
+        });
+
+        after(function () {
+            jsonRpcToKinesis.__ResetDependency__("processRpc");
+        });
+
+        beforeEach(function () {
+            processRpc.reset();
+        });
+
+        it("validates the rpc", function () {
+            var instance = {
+                validateRpc: sinon.stub().returns(BPromise.reject())
+            };
+            var evt = {id: 0};
+            var context = {
+                fail: sinon.spy()
+            };
+            return jsonRpcToKinesis.call(instance, evt, context).then(function () {
+                expect(instance.validateRpc).to.have.been.calledWith({id: 0});
+            });
+        });
+
+        it("calls the `processRpc` function if the validation is successfuil", function () {
+            var instance = {
+                validateRpc: sinon.stub().returns(BPromise.resolve())
+            };
+            var evt = {id: 0};
+            var context = {
+                succeed: sinon.spy()
+            };
+            return jsonRpcToKinesis.call(instance, evt, context).then(function () {
+                expect(processRpc).to.have.been.calledWith({id: 0});
+            });
+        });
+
+        it("doesn't call the `processRpc` function if the validation is not successfuil", function () {
+            var instance = {
+                validateRpc: sinon.stub().returns(BPromise.reject())
+            };
+            var evt = {id: 0};
+            var context = {
+                fail: sinon.spy()
+            };
+            return jsonRpcToKinesis.call(instance, evt, context).then(function () {
+                expect(processRpc).to.have.callCount(0);
+            });
+        });
+
+        it("calls `context.succeed` if all went well", function () {
+            var instance = {
+                validateRpc: sinon.stub().returns(BPromise.resolve())
+            };
+            var evt = {id: 0};
+            var context = {
+                succeed: sinon.spy()
+            };
+            return jsonRpcToKinesis.call(instance, evt, context).then(function () {
+                expect(context.succeed).to.have.been.calledWith({
+                    id: 0,
+                    result: null
+                });
+            });
+        });
+
+        it("calls `context.fail` if an error occurred (ValidationError)", function () {
+            var instance = {
+                validateRpc: sinon.stub().returns(BPromise.reject(
+                    new ValidationError(400, "Bad request")
+                ))
+            };
+            var evt = {id: 0};
+            var context = {
+                fail: sinon.spy()
+            };
+            return jsonRpcToKinesis.call(instance, evt, context).then(function () {
+                expect(context.fail).to.have.been.calledWith({
+                    id: 0,
+                    error: {
+                        code: 400,
+                        message: "Bad request"
+                    }
+                });
+            });
+        });
+
+        it("calls `context.fail` if an error occurred (non-ValidationError)", function () {
+            var instance = {
+                validateRpc: sinon.stub().returns(BPromise.reject())
+            };
+            var evt = {id: 0};
+            var context = {
+                fail: sinon.spy()
+            };
+            return jsonRpcToKinesis.call(instance, evt, context).then(function () {
+                expect(context.fail).to.have.been.calledWith({
+                    id: 0,
+                    error: {
+                        code: 500,
+                        message: "Internal server error"
+                    }
+                });
+            });
+        });
+
+    });
 
     describe("`processRpc`", function () {
 

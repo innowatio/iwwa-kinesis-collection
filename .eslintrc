@@ -17,6 +17,7 @@
         "new-cap": [2, {"capIsNew": false}],
         "no-extra-semi": [2],
         "no-multi-spaces": [0],
+        "no-undef": [2],
         "no-underscore-dangle": [0],
         "no-unused-vars": [2],
         "object-curly-spacing": [2, "never"],

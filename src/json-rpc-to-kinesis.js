@@ -1,9 +1,11 @@
+import BPromise from "bluebird";
 import uuid from "node-uuid";
+import R from "ramda";
 
 import * as kinesis from "./common/kinesis";
+import {ValidationError} from "./index";
 
 var insert = function (element) {
-    // TODO: auth and validation
     // Generate an id for the element to create
     var id = uuid.v4();
     return kinesis.putRecord({
@@ -19,7 +21,6 @@ var insert = function (element) {
 };
 
 var remove = function (id) {
-    // TODO: auth and validation
     return kinesis.putRecord({
         Data: JSON.stringify({
             id: uuid.v4(),
@@ -33,7 +34,6 @@ var remove = function (id) {
 };
 
 var replace = function (id, element) {
-    // TODO: auth and validation
     return kinesis.putRecord({
         Data: JSON.stringify({
             id: uuid.v4(),
@@ -60,13 +60,27 @@ var processRpc = function (event) {
 };
 
 export default function jsonRpcToKinesis (event, context) {
-    return processRpc.call(this, event)
+    return BPromise
+        .try(() => this.validateRpc(event))
+        .then(() => processRpc.call(this, event))
         .then(() => context.succeed({
             id: event.id,
             result: null
         }))
-        .catch(err => context.fail({
-            id: event.id,
-            error: err
-        }));
+        .catch(err => {
+            if (!R.is(ValidationError, err)) {
+                console.log([
+                    "Internal error:",
+                    err
+                ].join("\n"));
+                err = {
+                    code: 500,
+                    message: "Internal server error"
+                };
+            }
+            context.fail({
+                id: event.id,
+                error: err
+            });
+        });
 }
