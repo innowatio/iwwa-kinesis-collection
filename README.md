@@ -195,3 +195,28 @@ var myCollection = new Collection({
 
 export var handler = myCollection.kinesisToMongodb;
 ```
+
+### RPC validation
+
+It's possible to pass the constructor a `validateRpc` option, which must be a
+function which either:
+
+- returns a value
+- throws
+- returns a promise
+
+The validation is considered successful (and therefore the rcp is performed) if:
+
+- the `validateRpc` function returns a value
+- the `validateRpc` function returns a promise which is eventually resolved
+
+The validation is considered unsuccessful (and therefore the rcp is not
+performed) if:
+
+- the `validateRpc` function throws
+- the `validateRpc` function returns a promise which is eventually rejected
+
+If the error thrown / promise reject value is an instance of `ValidationError`
+(`import {ValidationError} from "lk-collection"`), then that error is used as
+error of the rpc. Otherwise a generic
+`{code: 500, message: "Internal server error"}` is used.
