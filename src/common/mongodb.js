@@ -9,7 +9,9 @@ export function upsert ({url, collectionName, query, element}) {
     return connect(url)
         .then(db => {
             var collection = db.collection(collectionName);
-            return promisify(collection.upsert, collection)(query, element);
+            return promisify(collection.update, collection)(
+                query, element, {upsert: true}
+            );
         });
 }
 
@@ -17,6 +19,8 @@ export function remove ({url, collectionName, query}) {
     return connect(url)
         .then(db => {
             var collection = db.collection(collectionName);
-            return promisify(collection.remove, collection)(query);
+            return promisify(collection.remove, collection)(
+                query
+            );
         });
 }
