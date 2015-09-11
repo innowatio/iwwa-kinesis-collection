@@ -56,10 +56,12 @@ The `data` property can be any JSON document.
 ```json
     {
         "data": {
+            "id": "110ec58a-a0f2-4ac4-8393-c866d813b8d1",
             "element": {
                 "elementKey": "elementValue"
             }
         },
+        "id": "6c84fb90-12c4-11e1-840d-7b25c5ee775a",
         "timestamp": 1437918813731,
         "type": "element inserted in collection collection-name"
     }
@@ -70,7 +72,7 @@ The `data` property can be any JSON document.
 Dynamodb:
 ```json
 {
-    "id": "someId",
+    "id": "110ec58a-a0f2-4ac4-8393-c866d813b8d1",
     "elementKey": "elementValue"
 }
 ```
@@ -78,7 +80,7 @@ Dynamodb:
 Mongodb:
 ```json
 {
-    "_id": "someId",
+    "_id": "110ec58a-a0f2-4ac4-8393-c866d813b8d1",
     "elementKey": "elementValue"
 }
 ```
