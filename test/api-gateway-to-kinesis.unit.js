@@ -1,6 +1,7 @@
 import BPromise from "bluebird";
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
+import merge from "ramda";
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
 
@@ -68,7 +69,28 @@ describe("`apiGatewayToKinesis`", function () {
 
     describe("`authenticate`", function () {
 
-        it("authenticate the user", function () {
+        const user = {
+            "_id": "user_id"
+        };
+        const mongodb = {
+            findOne: sinon.stub().returns(
+                BPromise.resolve(user)
+            )
+        };
+
+        before(function () {
+            apiGatewayToKinesis.__Rewire__("mongodb", mongodb);
+        });
+
+        it("attachs the user at the request object if authorized", function () {
+            var instance = {
+                mongodbUrl: "mongodbUrl",
+                mongodbCollectionName: "collectionName"
+            };
+            var request = {"token": "t3htoken"};
+            const authenticate = apiGatewayToKinesis.__get__("authenticate");
+            const promise = authenticate.call(instance, request);
+            return expect(promise).to.become({...request, user});
         });
     });
 
