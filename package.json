@@ -29,7 +29,7 @@
     "gulp-babel": "^5.1.0",
     "gulp-eslint": "^1.0.0",
     "gulp-spawn-mocha": "^2.2.1",
-    "istanbul": "^0.3.17",
+    "isparta": "^3.1.0",
     "mocha": "^2.2.5",
     "sinon": "^1.15.4",
     "sinon-chai": "^2.8.0"
@@ -40,7 +40,7 @@
     "dev": "gulp",
     "lint": "gulp lint",
     "prepublish": "gulp build",
-    "test": "gulp test"
+    "test": "env NODE_ENV=test env NODE_PATH=./src/ isparta cover _mocha --report lcovonly --report html -- -R spec --compilers js:babel/register test/**/*.js"
   },
   "author": "Team Wattellina <wattellina@mondora.com>",
   "license": "Apache-2.0"

@@ -2,7 +2,6 @@ import gulp from "gulp";
 import {execSync} from "child_process";
 import babel from "gulp-babel";
 import eslint from "gulp-eslint";
-import mocha from "gulp-spawn-mocha";
 
 gulp.task("build", function () {
     try {
@@ -16,15 +15,9 @@ gulp.task("build", function () {
 });
 
 gulp.task("test", function () {
-    return gulp.src(["test/**/*.js"])
-        .pipe(mocha({
-            compilers: "js:babel/register",
-            env: {
-                NODE_ENV: "test",
-                NODE_PATH: "./src/"
-            },
-            istanbul: true
-        }));
+    execSync("npm test", {
+        stdio: [null, process.stdout]
+    });
 });
 
 gulp.task("lint", function () {
