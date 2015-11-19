@@ -1,7 +1,6 @@
 import BPromise from "bluebird";
 import chai, {expect} from "chai";
 import chaiAsPromised from "chai-as-promised";
-import merge from "ramda";
 import sinon from "sinon";
 import sinonChai from "sinon-chai";
 
@@ -77,21 +76,113 @@ describe("`apiGatewayToKinesis`", function () {
                 BPromise.resolve(user)
             )
         };
+        const instance = {
+            mongodbUrl: "mongodbUrl"
+        };
+        const request = {token: "t3htoken"};
+        var authenticate;
 
-        before(function () {
+        beforeEach(function () {
+            authenticate = apiGatewayToKinesis.__get__("authenticate");
+            mongodb.findOne.reset();
             apiGatewayToKinesis.__Rewire__("mongodb", mongodb);
         });
 
-        it("attachs the user at the request object if authorized", function () {
-            var instance = {
-                mongodbUrl: "mongodbUrl",
-                mongodbCollectionName: "collectionName"
+        afterEach(function () {
+            apiGatewayToKinesis.__ResetDependency__("mongodb");
+        });
+
+        it("should call the findOne function with the correct parameter", function () {
+            const expectedParameter = {
+                url: "mongodbUrl",
+                query: {
+                    "services.resume.loginTokens.hashedToken": "t3htoken"
+                },
+                collectionName: "users"
             };
-            var request = {"token": "t3htoken"};
-            const authenticate = apiGatewayToKinesis.__get__("authenticate");
+            authenticate.call(instance, request);
+            expect(mongodb.findOne).to.have.callCount(1);
+            expect(mongodb.findOne).to.have.been.calledWith(expectedParameter);
+        });
+
+        it("attachs the user at the request object if authorized", function () {
             const promise = authenticate.call(instance, request);
             return expect(promise).to.become({...request, user});
         });
+
+    });
+
+    describe("`handle`", function () {
+
+        const insert = sinon.spy();
+        const replace = sinon.spy();
+        const remove = sinon.spy();
+        var handle;
+
+        beforeEach(function () {
+            handle = apiGatewayToKinesis.__get__("handle");
+            insert.reset();
+            apiGatewayToKinesis.__Rewire__("insert", insert);
+            replace.reset();
+            apiGatewayToKinesis.__Rewire__("replace", replace);
+            remove.reset();
+            apiGatewayToKinesis.__Rewire__("remove", remove);
+        });
+
+        afterEach(function () {
+            apiGatewayToKinesis.__ResetDependency__("insert");
+            apiGatewayToKinesis.__ResetDependency__("replace");
+            apiGatewayToKinesis.__ResetDependency__("remove");
+
+        });
+
+        it("should call the `insert` function with the correct parameter if the `request` handle the `POST` method", function () {
+            const request = {
+                method: "POST",
+                body: "body"
+            };
+            const instance = {};
+            handle.call(instance, request);
+            expect(insert).to.have.callCount(1);
+            expect(insert).to.have.calledWith("body");
+            expect(insert).to.have.calledOn(instance);
+        });
+
+        it("should call the `replace` function with the correct parameter if the `request` handle the `PUT` method", function () {
+            const request = {
+                method: "PUT",
+                body: "body"
+            };
+            const instance = {};
+            handle.call(instance, request);
+            expect(replace).to.have.callCount(1);
+            expect(replace).to.have.calledWith("body");
+            expect(replace).to.have.calledOn(instance);
+        });
+
+        it("should call the `remove` function with the correct parameter if the `request` handle the `DELETE` method", function () {
+            const request = {
+                method: "DELETE",
+                body: "body"
+            };
+            const instance = {};
+            handle.call(instance, request);
+            expect(remove).to.have.callCount(1);
+            expect(remove).to.have.calledWith("body");
+            expect(remove).to.have.calledOn(instance);
+        });
+
+        it("should call the `insert` function with the correct parameter if the `request` handle the `POST` method", function () {
+            const request = {
+                body: "body"
+            };
+            const instance = {};
+            const troublemaker = () => {
+                handle.call(instance, request);
+            };
+            expect(troublemaker).to.throw("MethodError");
+        });
+
     });
 
 });
