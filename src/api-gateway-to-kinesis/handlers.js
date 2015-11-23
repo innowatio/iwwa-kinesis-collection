@@ -23,6 +23,7 @@ export function insert (element) {
 }
 
 export function replace (id, element) {
+    // TODO check if exists!
     delete element.id;
     delete element._id;
     return putRecord(this.name, this.kinesisStreamName, {

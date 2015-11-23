@@ -1,9 +1,12 @@
 import {bind} from "bluebird";
+import getDebug from "debug";
 import {clone, is} from "ramda";
 
 import * as mongodb from "../services/mongodb";
 import {insert, replace, remove} from "./handlers";
 import RequestError from "./request-error";
+
+const debug = getDebug("lk-collection");
 
 function validate (request) {
     if (request.method === "remove") {
@@ -72,6 +75,8 @@ function pipeline (request) {
 }
 
 export default function apiGatewayToKinesis (request, context) {
+    debug("apiGatewayToKinesis called with:");
+    debug(JSON.stringify(request));
     return pipeline.call(this, request)
         .then(response => context.succeed(
             response
