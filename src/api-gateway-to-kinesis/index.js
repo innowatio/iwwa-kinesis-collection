@@ -1,12 +1,10 @@
 import {bind} from "bluebird";
-import getDebug from "debug";
 import {clone, is} from "ramda";
 
+import log from "../services/logger";
 import * as mongodb from "../services/mongodb";
 import {insert, replace, remove} from "./handlers";
 import RequestError from "./request-error";
-
-const debug = getDebug("lk-collection");
 
 function validate (request) {
     if (request.method === "remove") {
@@ -75,17 +73,14 @@ function pipeline (request) {
 }
 
 export default function apiGatewayToKinesis (request, context) {
-    debug("apiGatewayToKinesis called with:");
-    debug(JSON.stringify(request));
+    log.info({request}, "Received API Gateway request");
     return pipeline.call(this, request)
         .then(response => context.succeed(
             response
         ))
         .catch(error => {
             if (!is(RequestError, error)) {
-                console.log("Unexpected error");
-                console.log(error);
-                console.log(error.stack);
+                log.warn({error}, "Unexpected error");
                 error = new RequestError(500, "Internal server error");
             }
             context.fail(JSON.stringify(error));

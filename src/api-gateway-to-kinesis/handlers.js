@@ -1,9 +1,7 @@
 import {v4} from "node-uuid";
-import getDebug from "debug";
 
 import * as kinesis from "../services/kinesis";
-
-const debug = getDebug("lk-collection");
+import log from "../services/logger";
 
 function putRecord (PartitionKey, StreamName, Data) {
     const record = {
@@ -11,8 +9,7 @@ function putRecord (PartitionKey, StreamName, Data) {
         PartitionKey,
         StreamName
     };
-    debug("Putting kinesis record");
-    debug(record);
+    log.info({record}, "Putting Kinesis record");
     return kinesis.putRecord(record);
 }
 

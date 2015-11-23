@@ -11,7 +11,7 @@
     "ajv": "^2.0.1",
     "aws-sdk": "^2.2.18",
     "bluebird": "^3.0.5",
-    "debug": "^2.2.0",
+    "bunyan": "^1.5.1",
     "kinesis-router": "^1.2.1",
     "mongodb": "^2.0.49",
     "node-uuid": "^1.4.7",
