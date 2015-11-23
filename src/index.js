@@ -1,7 +1,5 @@
-import {always} from "ramda";
-
-import jsonRpcToKinesis from "./json-rpc-to-kinesis";
-import kinesisToDynamodb from "./kinesis-to-dynamodb";
+import apiGatewayToKinesis from "./api-gateway-to-kinesis";
+import {getValidateSchema, noop} from "./api-gateway-to-kinesis/utils";
 import kinesisToMongodb from "./kinesis-to-mongodb";
 
 export default class Collection {
@@ -9,30 +7,18 @@ export default class Collection {
     constructor (options) {
 
         this.name = options.name;
+        this.mongodbUrl = options.mongodbUrl;
 
-        // Configure jsonRpcToKinesis
-        this.validateRpc = options.validateRpc || always(true);
+        // Configure apiGatewayToKinesis
+        this.validateSchema = getValidateSchema(options.schema);
+        this.authorizeApiRequest = options.authorizeApiRequest || noop;
         this.kinesisStreamName = options.kinesisStreamName;
-        this.jsonRpcToKinesis = jsonRpcToKinesis.bind(this);
-
-        // Configure kinesisToDynamodb
-        this.dynamodbTableName = options.dynamodbTableName;
-        this.kinesisToDynamodb = kinesisToDynamodb.bind(this);
+        this.apiGatewayToKinesis = apiGatewayToKinesis.bind(this);
 
         // Configure kinesisToMongodb
-        this.mongodbUrl = options.mongodbUrl;
-        this.mongodbCollectionName = options.mongodbCollectionName;
+        this.mongodbCollectionName = options.name;
         this.kinesisToMongodb = kinesisToMongodb.bind(this);
 
-    }
-
-}
-
-export class ValidationError {
-
-    constructor (code, message) {
-        this.code = code;
-        this.message = message;
     }
 
 }

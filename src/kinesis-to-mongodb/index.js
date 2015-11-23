@@ -1,24 +1,24 @@
 import router from "kinesis-router";
-import {merge} from "ramda";
 
-import * as mongodb from "./common/mongodb";
+import * as mongodb from "../services/mongodb";
 
-var upsert = function (event) {
-    var {element, id} = event.data;
+function upsert (event) {
+    const {element, id} = event.data;
     return mongodb.upsert({
         url: this.mongodbUrl,
         collectionName: this.mongodbCollectionName,
         query: {
             _id: id
         },
-        element: merge(element, {
+        element: {
+            ...element,
             _id: id
-        })
+        }
     });
-};
+}
 
-var remove = function (event) {
-    var {id} = event.data;
+function remove (event) {
+    const {id} = event.data;
     return mongodb.remove({
         url: this.mongodbUrl,
         collectionName: this.mongodbCollectionName,
@@ -26,7 +26,7 @@ var remove = function (event) {
             _id: id
         }
     });
-};
+}
 
 export default function kinesisToMongodb (kinesisEvent, context) {
     return router()

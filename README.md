@@ -5,18 +5,15 @@
 
 #lk-collection
 
-Implement collections in an lk stack (Lambda, Kinesis).
+Implement collections in an lk stack (Lambda, Kinesis + MongoDB).
 
 ## How it works
 
-The library allows creating a collection object which has attached three (for
-now) lambda functions:
+The library allows creating a collection object which has attached two lambda
+functions:
 
-- `jsonRpcToKinesis`: takes events shaped like a JSON Rpc call and maps them to
-  kinesis events
-
-- `kinesisToDynamodb`: takes kinesis events and projects them into a dynamodb
-  table
+- `apiGatewayToKinesis`: takes a request from API Gateway and publishes an
+  event to a Kinesis stream
 
 - `kinesisToMongodb`: takes kinesis events and projects them into a mongodb
   collection
@@ -40,122 +37,129 @@ The `data` property can be any JSON document.
 
 ### Insert
 
-**JSON Rpc (coming, for instance, from an API Gateway request)**:
-
-```json
-    {
-        "method": "/collection-name/insert",
-        "params": [{
-            "elementKey": "elementValue"
-        }]
-    }
+**Client -> API Gateway**:
 ```
+POST /collection-name HTTP/1.1
+Host: api-gateway.amazon.com
+Content-Type: application/json
+X-Token: authToken
 
-**Resulting event sent to kinesis**:
-
-```json
-    {
-        "data": {
-            "id": "110ec58a-a0f2-4ac4-8393-c866d813b8d1",
-            "element": {
-                "elementKey": "elementValue"
-            }
-        },
-        "id": "6c84fb90-12c4-11e1-840d-7b25c5ee775a",
-        "timestamp": 1437918813731,
-        "type": "element inserted in collection collection-name"
-    }
-```
-
-**Resulting document inserted into dynamodb / mongodb**
-
-Dynamodb:
-```json
 {
-    "id": "110ec58a-a0f2-4ac4-8393-c866d813b8d1",
     "elementKey": "elementValue"
 }
 ```
-
-Mongodb:
+**API Gateway -> Lambda**:
 ```json
 {
-    "_id": "110ec58a-a0f2-4ac4-8393-c866d813b8d1",
+    "collection": "collection-name",
+    "method": "insert",
+    "element": {
+        "elementKey": "elementValue"
+    },
+    "token": "authToken"
+}
+```
+**Lambda -> Kinesis -> Lambda**:
+```json
+{
+    "data": {
+        "id": "generatedId",
+        "element": {
+            "elementKey": "elementValue"
+        }
+    },
+    "timestamp": "1970-01-01T00:00:00.000Z",
+    "type": "element inserted in collection collection-name"
+}
+```
+**Lambda -> MongoDB**:
+Inserted document:
+```json
+{
+    "_id": "generatedId",
     "elementKey": "elementValue"
 }
 ```
 
 ### Remove
 
-**JSON Rpc (coming, for instance, from an API Gateway request)**:
-
-```json
-    {
-        "method": "/collection-name/remove",
-        "params": ["elementId"]
-    }
+**Client -> API Gateway**:
 ```
-
-**Resulting event sent to kinesis**:
-
-```json
-    {
-        "data": {
-            "id": "elementId"
-        },
-        "timestamp": 1437918813731,
-        "type": "element removed in collection collection-name"
-    }
+DELETE /collection-name/elementId HTTP/1.1
+Host: api-gateway.amazon.com
+X-Token: authToken
 ```
-
-**Resuling operation performed in dynamodb / mongodb**
-
-Dynamodb: removal of document with `document.id === elementId`.
-Mongodb: removal of document with `document._id === elementId`.
-
-### Replace
-
-**JSON Rpc (coming, for instance, from an API Gateway request)**:
-
-```json
-    {
-        "method": "/collection-name/replace",
-        "params": ["elementId", {
-            "replacedKey": "replacedValue"
-        }]
-    }
-```
-
-**Resulting event sent to kinesis**:
-
-```json
-    {
-        "data": {
-            "id": "elementId",
-            "element": {
-                "replacedKey": "replacedValue"
-            }
-        },
-        "timestamp": 1437918813731,
-        "type": "element replaced in collection collection-name"
-    }
-```
-
-**Resulting document inserted into dynamodb / mongodb (replaces the existing one)**
-
-Dynamodb:
+**API Gateway -> Lambda**:
 ```json
 {
-    "id": "someId",
-    "replacedKey": "replacedValue"
+    "collection": "collection-name",
+    "method": "remove",
+    "elementId": "elementId",
+    "token": "authToken"
+}
+```
+**Lambda -> Kinesis -> Lambda**:
+```json
+{
+    "data": {
+        "id": "elementId"
+    },
+    "timestamp": "1970-01-01T00:00:00.000Z",
+    "type": "element removed in collection collection-name"
+}
+```
+**Lambda -> MongoDB**
+Removed document:
+```json
+{
+    "_id": "elementId"
 }
 ```
 
-Mongodb:
+### Replace
+
+**Client -> API Gateway**:
+```
+PUT /collection-name/elementId HTTP/1.1
+Host: api-gateway.amazon.com
+Content-Type: application/json
+X-Token: authToken
+
+{
+    "elementKey": "replacedValue"
+}
+```
+**API Gateway -> Lambda**:
 ```json
 {
-    "_id": "someId",
-    "replacedKey": "replacedValue"
+    "collection": "collection-name",
+    "method": "replace",
+    "elementId": "elementId",
+    "element": {
+        "elementKey": "replacedValue"
+    },
+    "token": "authToken"
+}
+```
+**Lambda -> Kinesis -> Lambda**:
+```json
+{
+    "data": {
+        "id": "elementId",
+        "element": {
+            "elementKey": "replacedValue"
+        }
+    },
+    "timestamp": "1970-01-01T00:00:00.000Z",
+    "type": "element replaced in collection collection-name"
+}
+```
+**Lambda -> MongoDB**
+Updated document:
+```json
+{
+    "_id": "elementId",
+    "elementKey": "replacedValue"
 }
 ```
 
@@ -163,62 +167,60 @@ Mongodb:
 
 ```js
 /* Lambda function invoked by API Gateway */
-import Collection from "lk-collection";
+import Collection, {RequestError} from "lk-collection";
 
-var myCollection = new Collection({
-    name: "myCollectionName"
+const myCollection = new Collection({
+    name: "myCollectionName",
+    mongodbUrl: "mongodb://myMongoHost/myDb",
+    schema: {
+        $schema: "http://json-schema.org/draft-04/schema#",
+        type: "object"
+    },
+    authorizeApiRequest: (request) => {
+        if (Math.random() > 0.5) {
+            throw new RequestError(400, "Message", "Details");
+        }
+    },
     kinesisStreamName: "myStream"
 });
 
-export var handler = myCollection.jsonRpcToKinesis;
+export const handler = myCollection.jsonRpcToKinesis;
 ```
 
 ```js
 /* Lambda function invoked by Kinesis */
 import Collection from "lk-collection";
 
-var myCollection = new Collection({
+const myCollection = new Collection({
     name: "myCollectionName",
-    dynamodbTableName: "myTable"
+    mongodbUrl: "mongodb://myMongoHost/myDb",
 });
 
-export var handler = myCollection.kinesisToDynamodb;
+export const handler = myCollection.kinesisToDynamodb;
 ```
 
-```js
-/* Lambda function invoked by Kinesis */
-import Collection from "lk-collection";
+### Authorization
 
-var myCollection = new Collection({
-    name: "myCollectionName",
-    mongodbUrl: "mongodb://mongo:27017/myDatabase",
-    mongodbCollectionName: "myCollection"
-});
-
-export var handler = myCollection.kinesisToMongodb;
-```
-
-### RPC validation
-
-It's possible to pass the constructor a `validateRpc` option, which must be a
-function which either:
+It's possible to pass the constructor an `authorizeApiRequest` function which
+either:
 
 - returns a value
 - throws
 - returns a promise
 
-The validation is considered successful (and therefore the rcp is performed) if:
+The validation is considered successful (hence the request is handled) if:
 
-- the `validateRpc` function returns a value
-- the `validateRpc` function returns a promise which is eventually resolved
+- the `authorizeApiRequest` function returns a value
+- the `authorizeApiRequest` function returns a promise which is eventually
+  resolved
 
-The validation is considered unsuccessful (and therefore the rcp is not
-performed) if:
+The validation is considered unsuccessful (hence the request is rejected) if:
 
-- the `validateRpc` function throws
-- the `validateRpc` function returns a promise which is eventually rejected
+- the `authorizeApiRequest` function throws
+- the `authorizeApiRequest` function returns a promise which is eventually
+  rejected
 
-If the error thrown / promise reject value is an instance of `ValidationError`
-(`import {ValidationError} from "lk-collection"`), then that error is used as
-error of the rpc. Otherwise a generic
+If the error thrown / promise reject value is an instance of `RequestError`
+(`import {RequestError} from "lk-collection"`), then that error is used as
+error of the request. Otherwise a generic
 `{code: 500, message: "Internal server error"}` is used.
