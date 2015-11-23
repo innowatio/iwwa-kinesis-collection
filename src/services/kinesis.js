@@ -5,4 +5,4 @@ const kinesis = new Kinesis({
     apiVersion: "2013-12-02"
 });
 
-export const putRecord = promisify(kinesis.putRecord, kinesis);
+export const putRecord = promisify(kinesis.putRecord, {context: kinesis});
