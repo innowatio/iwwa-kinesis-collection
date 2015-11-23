@@ -82,7 +82,7 @@ export default function apiGatewayToKinesis (request, context) {
         ))
         .catch(error => {
             if (!is(RequestError, error)) {
-                log.warn({error}, "Unexpected error");
+                log.warn(error, "Unexpected error");
                 error = new RequestError(500, "Internal server error");
             }
             context.fail(JSON.stringify(error));
