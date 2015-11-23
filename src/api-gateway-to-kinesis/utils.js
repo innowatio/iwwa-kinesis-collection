@@ -1,14 +1,20 @@
 import Ajv from "ajv";
-import {resolve} from "bluebird";
-import {always} from "ramda";
 
-export function wrapAuthorize (authorize) {
-    return request => (
-        resolve(request).then(authorize || always(true))
-    );
+export function noop () {
+    // noop
 }
 
-const ajv = new Ajv();
-export function checkSchema (schema, element) {
-    return ajv.validate(schema, element);
+export function getValidateSchema (schema) {
+    const ajv = new Ajv({
+        allErrors: true,
+        format: "full"
+    });
+    const validate = ajv.compile(schema);
+    return object => {
+        const isValid = validate(object);
+        return {
+            isValid: isValid,
+            errors: isValid ? null : ajv.errorsText(validate.errors)
+        };
+    };
 }

@@ -10,6 +10,7 @@
   "dependencies": {
     "ajv": "^2.0.1",
     "aws-sdk": "^2.2.18",
+    "bluebird": "^3.0.5",
     "kinesis-router": "^1.2.1",
     "mongodb": "^2.0.49",
     "node-uuid": "^1.4.7",
@@ -20,7 +21,6 @@
     "babel-core": "^5.8.34",
     "babel-eslint": "^4.1.5",
     "babel-plugin-rewire": "^0.1.22",
-    "bluebird": "^3.0.5",
     "chai": "^3.4.1",
     "chai-as-promised": "^5.1.0",
     "coveralls": "^2.11.4",
@@ -34,12 +34,12 @@
   "scripts": {
     "build": "babel src --out-dir lib",
     "clean": "rimraf lib coverage",
-    "coverage": "NODE_ENV=test babel-node $(npm bin)/isparta cover $(npm bin)/_mocha -- --recursive",
+    "coverage": "NODE_PATH=src NODE_ENV=test babel-node $(npm bin)/isparta cover $(npm bin)/_mocha -- --recursive",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "dev": "npm test -- --watch",
     "lint": "eslint src test",
     "prepublish": "npm run clean && npm run build",
-    "test": "NODE_ENV=test mocha --compilers js:babel/register --recursive"
+    "test": "NODE_PATH=src NODE_ENV=test mocha --compilers js:babel/register --recursive"
   },
   "author": "Team Wattellina <wattellina@mondora.com>",
   "license": "Apache-2.0"

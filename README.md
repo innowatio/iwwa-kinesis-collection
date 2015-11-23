@@ -12,16 +12,30 @@ Implement collections in an lk stack (Lambda, Kinesis).
 The library allows creating a collection object which has attached three (for
 now) lambda functions:
 
-- `jsonRpcToKinesis`: takes events shaped like a JSON Rpc call and maps them to
-  kinesis events
-
-- `kinesisToDynamodb`: takes kinesis events and projects them into a dynamodb
-  table
+- `apiGatewayToKinesis`: TODO
 
 - `kinesisToMongodb`: takes kinesis events and projects them into a mongodb
   collection
 
 ![Flow](./docs/flow.png)
+
+
+
+API Gateway event format:
+
+```js
+{
+    "method": "POST",
+    "body": "whatever",
+    "token": "authToken"
+}
+```
+
+
+
+
+
+
 
 ## Application event format
 

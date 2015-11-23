@@ -22,20 +22,25 @@ export function insert (element) {
     });
 }
 
-export function remove (id) {
-    return putRecord(this.name, this.kinesisStreamName, {
-        id: v4(),
-        data: {id},
-        timestamp: new Date().toISOString(),
-        type: `element removed in collection ${this.name}`
-    });
-}
-
 export function replace (id, element) {
     return putRecord(this.name, this.kinesisStreamName, {
         id: v4(),
-        data: {id, element},
+        data: {
+            id,
+            element
+        },
         timestamp: new Date().toISOString(),
         type: `element replaced in collection ${this.name}`
+    });
+}
+
+export function remove (id) {
+    return putRecord(this.name, this.kinesisStreamName, {
+        id: v4(),
+        data: {
+            id
+        },
+        timestamp: new Date().toISOString(),
+        type: `element removed in collection ${this.name}`
     });
 }

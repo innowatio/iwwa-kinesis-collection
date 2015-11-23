@@ -1,5 +1,5 @@
 import apiGatewayToKinesis from "./api-gateway-to-kinesis";
-import {wrapAuthorize} from "./api-gateway-to-kinesis/utils";
+import {getValidateSchema, noop} from "./api-gateway-to-kinesis/utils";
 import kinesisToMongodb from "./kinesis-to-mongodb";
 
 export default class Collection {
@@ -10,8 +10,8 @@ export default class Collection {
         this.mongodbUrl = options.mongodbUrl;
 
         // Configure apiGatewayToKinesis
-        this.schema = options.schema;
-        this.authorizeApiRequest = wrapAuthorize(options.authorizeApiRequest);
+        this.validateSchema = getValidateSchema(options.schema);
+        this.authorizeApiRequest = options.authorizeApiRequest || noop;
         this.kinesisStreamName = options.kinesisStreamName;
         this.apiGatewayToKinesis = apiGatewayToKinesis.bind(this);
 
