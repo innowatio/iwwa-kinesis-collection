@@ -1,13 +1,19 @@
 import {v4} from "node-uuid";
+import getDebug from "debug";
 
 import * as kinesis from "../services/kinesis";
 
+const debug = getDebug("lk-collection");
+
 function putRecord (PartitionKey, StreamName, Data) {
-    return kinesis.putRecord({
+    const record = {
         Data: JSON.stringify(Data),
         PartitionKey,
         StreamName
-    });
+    };
+    debug("Putting kinesis record");
+    debug(record);
+    return kinesis.putRecord(record);
 }
 
 export function insert (element) {
