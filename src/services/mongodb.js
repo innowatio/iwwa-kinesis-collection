@@ -16,3 +16,10 @@ export function remove ({url, collectionName, query}) {
             query
         ));
 }
+
+export function findOne ({url, collectionName, query}) {
+    return connect(url)
+        .then(db => db.collection(collectionName).findOne(
+            query
+        ));
+}
