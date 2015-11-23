@@ -184,7 +184,7 @@ const myCollection = new Collection({
     kinesisStreamName: "myStream"
 });
 
-export const handler = myCollection.jsonRpcToKinesis;
+export const handler = myCollection.apiGatewayToKinesis;
 ```
 
 ```js
@@ -196,7 +196,7 @@ const myCollection = new Collection({
     mongodbUrl: "mongodb://myMongoHost/myDb",
 });
 
-export const handler = myCollection.kinesisToDynamodb;
+export const handler = myCollection.kinesisToMongodb;
 ```
 
 ### Authorization
