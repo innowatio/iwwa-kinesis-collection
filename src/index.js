@@ -22,3 +22,5 @@ export default class Collection {
     }
 
 }
+
+export {default as RequestError} from "./api-gateway-to-kinesis/request-error";
