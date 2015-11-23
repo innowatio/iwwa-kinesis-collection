@@ -16,7 +16,7 @@ export default class Collection {
         this.apiGatewayToKinesis = apiGatewayToKinesis.bind(this);
 
         // Configure kinesisToMongodb
-        this.mongodbCollectionName = options.mongodbCollectionName || options.name;
+        this.mongodbCollectionName = options.name;
         this.kinesisToMongodb = kinesisToMongodb.bind(this);
 
     }
