@@ -275,7 +275,7 @@ describe("apiGatewayToKinesis", () => {
             apiGatewayToKinesis.__Rewire__("pipeline", resolvingPipeline);
             return apiGatewayToKinesis({}, context).then(() => {
                 expect(context.succeed).to.have.been.calledWith({});
-            })
+            });
         });
 
         it("calls `context.fail` if the pipeline rejects (1 of 2)", () => {
@@ -289,7 +289,7 @@ describe("apiGatewayToKinesis", () => {
                     message: "Message",
                     details: "Details"
                 });
-            })
+            });
         });
 
         it("calls `context.fail` if the pipeline rejects (2 of 2)", () => {
@@ -303,7 +303,7 @@ describe("apiGatewayToKinesis", () => {
                     message: "Internal server error",
                     details: undefined
                 });
-            })
+            });
         });
 
     });
