@@ -7,6 +7,7 @@
 
 Implement collections in an lk stack (Lambda, Kinesis + MongoDB).
 
+TODO: transaction id
 ## How it works
 
 The library allows creating a collection object which has attached two lambda
