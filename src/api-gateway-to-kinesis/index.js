@@ -1,10 +1,12 @@
 import {bind} from "bluebird";
 import {clone, is} from "ramda";
 
-import log from "../services/logger";
+import {getLogger} from "../services/logger";
 import * as mongodb from "../services/mongodb";
 import {insert, replace, remove} from "./handlers";
 import RequestError from "./request-error";
+
+const log = getLogger();
 
 function validate (request) {
     if (request.method === "remove") {

@@ -23,4 +23,5 @@ export default class Collection {
 
 }
 
+export {setLogger} from "./services/logger";
 export {default as RequestError} from "./api-gateway-to-kinesis/request-error";

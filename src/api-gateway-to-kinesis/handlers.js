@@ -1,7 +1,9 @@
 import {v4} from "node-uuid";
 
 import * as kinesis from "../services/kinesis";
-import log from "../services/logger";
+import {getLogger} from "../services/logger";
+
+const log = getLogger();
 
 function putRecord (PartitionKey, StreamName, Data) {
     const record = {
