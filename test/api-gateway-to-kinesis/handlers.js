@@ -76,6 +76,28 @@ describe("handlers", () => {
                 StreamName: "kinesisStreamName"
             });
         });
+        it("strips `id` and `_id` from `element`", () => {
+            const instance = {
+                name: "collectionName",
+                kinesisStreamName: "kinesisStreamName"
+            };
+            const id = "id";
+            const element = {_id: "id", id: "id"};
+            handlers.replace.call(instance, id, element);
+            expect(kinesis.putRecord).to.have.been.calledWith({
+                Data: JSON.stringify({
+                    id: "id",
+                    data: {
+                        id: "id",
+                        element: {}
+                    },
+                    timestamp: "1970-01-01T00:00:00.000Z",
+                    type: "element replaced in collection collectionName"
+                }),
+                PartitionKey: "collectionName",
+                StreamName: "kinesisStreamName"
+            });
+        });
     });
 
     describe("remove", () => {

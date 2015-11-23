@@ -17,9 +17,25 @@ describe("apiGatewayToKinesis", () => {
     describe("validate", () => {
 
         const validate = apiGatewayToKinesis.__get__("validate");
-        const request = {body: {element: 2}};
+        const request = {
+            element: {key: "value"}
+        };
 
-        it("if the request body is valid, returns the request", () => {
+        it("if the request method is `remove`, returns the request", () => {
+            const instance = {
+                validateSchema: always({
+                    isValid: true,
+                    errors: null
+                })
+            };
+            const removeRequest = {
+                method: "remove"
+            };
+            const ret = validate.call(instance, removeRequest);
+            expect(ret).to.equal(removeRequest);
+        });
+
+        it("if the request `element` is valid, returns the request", () => {
             const instance = {
                 validateSchema: always({
                     isValid: true,
@@ -30,7 +46,7 @@ describe("apiGatewayToKinesis", () => {
             expect(ret).to.equal(request);
         });
 
-        it("if the request body is not valid, throws a `ValidationError`", () => {
+        it("if the request `element` is not valid, throws a `ValidationError`", () => {
             const instance = {
                 validateSchema: always({
                     isValid: false,
@@ -158,10 +174,10 @@ describe("apiGatewayToKinesis", () => {
             remove.reset();
         });
 
-        it("calls `insert` on `POST`s", () => {
+        it("calls `insert` on `insert`s", () => {
             const request = {
-                method: "POST",
-                body: {}
+                method: "insert",
+                element: {}
             };
             const instance = {};
             handle.call(instance, request);
@@ -170,34 +186,34 @@ describe("apiGatewayToKinesis", () => {
             expect(insert).to.have.calledOn(instance);
         });
 
-        it("calls `replace` on `PUT`s", () => {
+        it("calls `replace` on `replace`s", () => {
             const request = {
-                method: "PUT",
-                body: {}
+                method: "replace",
+                elementId: "id",
+                element: {}
             };
             const instance = {};
             handle.call(instance, request);
             expect(replace).to.have.callCount(1);
-            expect(replace).to.have.calledWith({});
+            expect(replace).to.have.calledWith("id", {});
             expect(replace).to.have.calledOn(instance);
         });
 
-        it("calls `remove` on `DELETE`s", () => {
+        it("calls `remove` on `remove`s", () => {
             const request = {
-                method: "DELETE",
-                body: {}
+                method: "remove",
+                elementId: "id"
             };
             const instance = {};
             handle.call(instance, request);
             expect(remove).to.have.callCount(1);
-            expect(remove).to.have.calledWith({});
+            expect(remove).to.have.calledWith("id");
             expect(remove).to.have.calledOn(instance);
         });
 
         it("throws a `MethodError` otherwise", () => {
             const request = {
-                body: "body",
-                method: "HEAD"
+                method: "find"
             };
             const instance = {};
             const troublemaker = handle.bind(instance, request);
@@ -205,7 +221,7 @@ describe("apiGatewayToKinesis", () => {
             expect(getErrorFromFunction(troublemaker)).to.deep.equal({
                 code: 400,
                 message: "MethodError",
-                details: "Unsupported method HEAD"
+                details: "Unsupported method find"
             });
         });
 

@@ -6,7 +6,10 @@ import {insert, replace, remove} from "./handlers";
 import RequestError from "./request-error";
 
 function validate (request) {
-    const validation = this.validateSchema(request.body);
+    if (request.method === "remove") {
+        return request;
+    }
+    const validation = this.validateSchema(request.element);
     if (validation.isValid) {
         return request;
     } else {
@@ -49,12 +52,12 @@ function authorize (request) {
 function handle (request) {
     const {method} = request;
     switch (method) {
-    case "POST":
-        return insert.call(this, request.body);
-    case "PUT":
-        return replace.call(this, request.body);
-    case "DELETE":
-        return remove.call(this, request.body);
+    case "insert":
+        return insert.call(this, request.element);
+    case "replace":
+        return replace.call(this, request.elementId, request.element);
+    case "remove":
+        return remove.call(this, request.elementId);
     default:
         throw new RequestError(400, "MethodError", `Unsupported method ${method}`);
     }
