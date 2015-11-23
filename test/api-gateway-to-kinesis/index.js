@@ -300,11 +300,11 @@ describe("apiGatewayToKinesis", () => {
             ));
             apiGatewayToKinesis.__Rewire__("pipeline", rejectingPipeline);
             return apiGatewayToKinesis({}, context).then(() => {
-                expect(context.fail).to.have.been.calledWith({
+                expect(context.fail).to.have.been.calledWith(JSON.stringify({
                     code: 400,
                     message: "Message",
                     details: "Details"
-                });
+                }));
             });
         });
 
@@ -314,11 +314,11 @@ describe("apiGatewayToKinesis", () => {
             ));
             apiGatewayToKinesis.__Rewire__("pipeline", rejectingPipeline);
             return apiGatewayToKinesis({}, context).then(() => {
-                expect(context.fail).to.have.been.calledWith({
+                expect(context.fail).to.have.been.calledWith(JSON.stringify({
                     code: 500,
                     message: "Internal server error",
                     details: undefined
-                });
+                }));
             });
         });
 
