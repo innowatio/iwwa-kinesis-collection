@@ -81,9 +81,9 @@ export default function apiGatewayToKinesis (request, context) {
         .then(response => context.succeed(
             response
         ))
-        .catch(error => context.fail(
+        .catch(error => context.fail(JSON.stringify(
             is(RequestError, error) ?
             error :
             new RequestError(500, "Internal server error")
-        ));
+        )));
 }
