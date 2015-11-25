@@ -23,3 +23,11 @@ export function findOne ({url, collectionName, query}) {
             query
         ));
 }
+
+export function exists ({url, collectionName, query}) {
+    return connect(url)
+        .then(db => db.collection(collectionName)
+            .find(query).limit(1).count(true)
+        )
+        .then(count => count > 0);
+}

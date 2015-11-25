@@ -153,25 +153,41 @@ describe("apiGatewayToKinesis", () => {
 
     describe("handle", () => {
 
+        const findOne = sinon.spy();
         const insert = sinon.spy();
-        const replace = sinon.spy();
         const remove = sinon.spy();
+        const replace = sinon.spy();
         const handle = apiGatewayToKinesis.__get__("handle");
 
         before(() => {
+            apiGatewayToKinesis.__Rewire__("findOne", findOne);
             apiGatewayToKinesis.__Rewire__("insert", insert);
-            apiGatewayToKinesis.__Rewire__("replace", replace);
             apiGatewayToKinesis.__Rewire__("remove", remove);
+            apiGatewayToKinesis.__Rewire__("replace", replace);
         });
         after(() => {
+            apiGatewayToKinesis.__ResetDependency__("findOne");
             apiGatewayToKinesis.__ResetDependency__("insert");
-            apiGatewayToKinesis.__ResetDependency__("replace");
             apiGatewayToKinesis.__ResetDependency__("remove");
+            apiGatewayToKinesis.__ResetDependency__("replace");
         });
         beforeEach(() => {
+            findOne.reset();
             insert.reset();
-            replace.reset();
             remove.reset();
+            replace.reset();
+        });
+
+        it("calls `findOne` on `findOne`s", () => {
+            const request = {
+                method: "findOne",
+                elementId: "id"
+            };
+            const instance = {};
+            handle.call(instance, request);
+            expect(findOne).to.have.callCount(1);
+            expect(findOne).to.have.calledWith("id");
+            expect(findOne).to.have.calledOn(instance);
         });
 
         it("calls `insert` on `insert`s", () => {
@@ -184,6 +200,18 @@ describe("apiGatewayToKinesis", () => {
             expect(insert).to.have.callCount(1);
             expect(insert).to.have.calledWith({});
             expect(insert).to.have.calledOn(instance);
+        });
+
+        it("calls `remove` on `remove`s", () => {
+            const request = {
+                method: "remove",
+                elementId: "id"
+            };
+            const instance = {};
+            handle.call(instance, request);
+            expect(remove).to.have.callCount(1);
+            expect(remove).to.have.calledWith("id");
+            expect(remove).to.have.calledOn(instance);
         });
 
         it("calls `replace` on `replace`s", () => {
@@ -199,18 +227,6 @@ describe("apiGatewayToKinesis", () => {
             expect(replace).to.have.calledOn(instance);
         });
 
-        it("calls `remove` on `remove`s", () => {
-            const request = {
-                method: "remove",
-                elementId: "id"
-            };
-            const instance = {};
-            handle.call(instance, request);
-            expect(remove).to.have.callCount(1);
-            expect(remove).to.have.calledWith("id");
-            expect(remove).to.have.calledOn(instance);
-        });
-
         it("throws a `MethodError` otherwise", () => {
             const request = {
                 method: "find"
@@ -219,7 +235,7 @@ describe("apiGatewayToKinesis", () => {
             const troublemaker = handle.bind(instance, request);
             expect(troublemaker).to.throw(RequestError);
             expect(getErrorFromFunction(troublemaker)).to.deep.equal({
-                code: 400,
+                code: 501,
                 message: "MethodError",
                 details: "Unsupported method find"
             });

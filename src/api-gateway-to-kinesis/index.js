@@ -3,7 +3,7 @@ import {clone, is} from "ramda";
 
 import {getLogger} from "../services/logger";
 import * as mongodb from "../services/mongodb";
-import {insert, replace, remove} from "./handlers";
+import {findOne, insert, remove, replace} from "./handlers";
 import RequestError from "./request-error";
 
 const log = getLogger();
@@ -55,14 +55,16 @@ function authorize (request) {
 function handle (request) {
     const {method} = request;
     switch (method) {
+    case "findOne":
+        return findOne.call(this, request.elementId);
     case "insert":
         return insert.call(this, request.element);
-    case "replace":
-        return replace.call(this, request.elementId, request.element);
     case "remove":
         return remove.call(this, request.elementId);
+    case "replace":
+        return replace.call(this, request.elementId, request.element);
     default:
-        throw new RequestError(400, "MethodError", `Unsupported method ${method}`);
+        throw new RequestError(501, "MethodError", `Unsupported method ${method}`);
     }
 }
 
