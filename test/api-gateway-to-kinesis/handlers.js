@@ -57,7 +57,7 @@ describe("handlers", () => {
                             timestamp: "1970-01-01T00:00:00.000Z",
                             type: "element inserted in collection collectionName"
                         }),
-                        PartitionKey: "collectionName",
+                        PartitionKey: "collectionNameprovidedId",
                         StreamName: "kinesisStreamName"
                     });
                 });
@@ -110,7 +110,7 @@ describe("handlers", () => {
                             timestamp: "1970-01-01T00:00:00.000Z",
                             type: "element inserted in collection collectionName"
                         }),
-                        PartitionKey: "collectionName",
+                        PartitionKey: "collectionNameid",
                         StreamName: "kinesisStreamName"
                     });
                 });
@@ -170,7 +170,7 @@ describe("handlers", () => {
                             timestamp: "1970-01-01T00:00:00.000Z",
                             type: "element replaced in collection collectionName"
                         }),
-                        PartitionKey: "collectionName",
+                        PartitionKey: "collectionNameid",
                         StreamName: "kinesisStreamName"
                     });
                 });
@@ -196,7 +196,7 @@ describe("handlers", () => {
                             timestamp: "1970-01-01T00:00:00.000Z",
                             type: "element replaced in collection collectionName"
                         }),
-                        PartitionKey: "collectionName",
+                        PartitionKey: "collectionNameid",
                         StreamName: "kinesisStreamName"
                     });
                 });
@@ -252,7 +252,7 @@ describe("handlers", () => {
                             timestamp: "1970-01-01T00:00:00.000Z",
                             type: "element removed in collection collectionName"
                         }),
-                        PartitionKey: "collectionName",
+                        PartitionKey: "collectionNameid",
                         StreamName: "kinesisStreamName"
                     });
                 });
