@@ -43,7 +43,7 @@ export function insert (element) {
         })
         .then(() => {
             delete element.id;
-            return putRecord(this.name, this.kinesisStreamName, {
+            return putRecord(this.name + id, this.kinesisStreamName, {
                 id: v4(),
                 data: {id, element},
                 timestamp: new Date().toISOString(),
@@ -68,7 +68,7 @@ export function replace (id, element) {
         .then(() => {
             delete element.id;
             delete element._id;
-            return putRecord(this.name, this.kinesisStreamName, {
+            return putRecord(this.name + id, this.kinesisStreamName, {
                 id: v4(),
                 data: {id, element},
                 timestamp: new Date().toISOString(),
@@ -91,7 +91,7 @@ export function remove (id) {
             }
         })
         .then(() => {
-            return putRecord(this.name, this.kinesisStreamName, {
+            return putRecord(this.name + id, this.kinesisStreamName, {
                 id: v4(),
                 data: {id},
                 timestamp: new Date().toISOString(),
