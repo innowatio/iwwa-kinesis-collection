@@ -1,6 +1,6 @@
 {
   "name": "lk-collection",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Implement collections in a lk stack (Lambda, Kinesis, MongoDB)",
   "main": "lib/index.js",
   "repository": {
